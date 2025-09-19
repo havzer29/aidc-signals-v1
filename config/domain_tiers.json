@@ -1,0 +1,28 @@
+{
+  "tier1": [
+    "www.wsj.com",
+    "www.nytimes.com",
+    "www.reuters.com",
+    "www.bloomberg.com",
+    "www.ft.com",
+    "www.cnbc.com",
+    "www.barrons.com",
+    "www.seekingalpha.com"
+  ],
+  "tier2": [
+    "www.theverge.com",
+    "www.techcrunch.com",
+    "www.zdnet.com",
+    "www.datacenterdynamics.com",
+    "www.datacenterknowledge.com",
+    "www.fool.com",
+    "www.marketwatch.com",
+    "www.tomshardware.com"
+  ],
+  "tier3": [
+    "www.prnewswire.com",
+    "www.businesswire.com",
+    "www.globenewswire.com",
+    "www.marketscreener.com"
+  ]
+}

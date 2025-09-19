@@ -1,0 +1,5 @@
+https://www.reuters.com/technology/rss
+https://feeds.arstechnica.com/arstechnica/technology-lab
+https://www.datacenterdynamics.com/en/rss
+https://www.datacenterknowledge.com/rss.xml
+https://feeds.feedburner.com/Techcrunch
