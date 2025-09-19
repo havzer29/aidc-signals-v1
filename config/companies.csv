@@ -1,0 +1,67 @@
+ticker,company,aliases
+NVDA,NVIDIA Corporation,NVIDIA|GeForce|CUDA
+AMD,Advanced Micro Devices,AMD|Radeon|EPYC
+AVGO,Broadcom Inc.,Broadcom|VMware
+TSM,Taiwan Semiconductor Manufacturing Company,TSMC
+ASML,ASML Holding,ASML
+INTC,Intel Corporation,Intel|Xeon
+MSFT,Microsoft Corporation,Microsoft|Azure
+AMZN,Amazon.com Inc.,Amazon|AWS
+GOOGL,Alphabet Inc.,Google|Alphabet|GCP
+META,Meta Platforms Inc.,Facebook|Meta|Instagram
+AAPL,Apple Inc.,Apple
+SMCI,Super Micro Computer,Supermicro
+DELL,Dell Technologies,Dell
+HPE,Hewlett Packard Enterprise,HPE|Hewlett Packard Enterprise
+ORCL,Oracle Corporation,Oracle|OCI
+IBM,International Business Machines,IBM|Big Blue
+SNOW,Snowflake Inc.,Snowflake
+MDB,MongoDB Inc.,MongoDB
+PLAN,Anaplan Inc.,Anaplan
+PLTR,Palantir Technologies,Palantir
+ADBE,Adobe Inc.,Adobe
+CRM,Salesforce Inc.,Salesforce
+NOW,ServiceNow Inc.,ServiceNow
+NTNX,Nutanix Inc.,Nutanix
+DOCN,DigitalOcean Holdings,DigitalOcean
+EQIX,Equinix Inc.,Equinix
+DLR,Digital Realty Trust,Digital Realty|DLR
+CONE,CyrusOne LLC,CyrusOne
+QTS,QTS Realty Trust,QTS Realty
+LAMR,Lamar Advertising,Lamar
+SSTK,Shutterstock Inc.,Shutterstock
+ZEN,Zendesk Inc.,Zendesk
+TEAM,Atlassian Corporation,Atlassian|Jira
+SHOP,Shopify Inc.,Shopify
+ADSK,Autodesk Inc.,Autodesk
+ANET,Arista Networks,Arista
+CSCO,Cisco Systems,Cisco
+ERIC,Telefonaktiebolaget LM Ericsson,Ericsson
+NOK,Nokia Corporation,Nokia
+LRCX,Applied Materials,Applied Materials|Lam|AMAT
+AMAT,Applied Materials Inc.,Applied Materials
+KLAC,KLA Corporation,KLA
+MU,Micron Technology,Micron
+WDC,Western Digital,Western Digital|SanDisk
+TXN,Texas Instruments,Texas Instruments
+QCOM,Qualcomm Inc.,Qualcomm
+SWKS,Skyworks Solutions,Skyworks
+QRVO,Qorvo Inc.,Qorvo
+STM,STMicroelectronics,STMicro
+NXPI,NXP Semiconductors,NXP
+MRVL,Marvell Technology,Marvell
+SMG,Scotts Miracle-Gro,Scotts
+VXUS,Vanguard Total International Stock ETF,
+NET,Cloudflare Inc.,Cloudflare
+DDOG,Datadog Inc.,Datadog
+ZS,Zscaler Inc.,Zscaler
+OKTA,Okta Inc.,Okta
+SPLK,Splunk Inc.,Splunk
+PANW,Palo Alto Networks,Palo Alto Networks|PANW
+CRWD,CrowdStrike Holdings,CrowdStrike
+AFRM,Affirm Holdings,Affirm
+PATH,UiPath Inc.,UiPath
+AI,C3.ai Inc.,C3.ai
+EXAS,Exact Sciences,Exact Sciences
+U,Unity Software,Unity
+RBLX,Roblox Corporation,Roblox
