@@ -1,4 +1,5 @@
-"""Verdict generation from article scores."""
+"""Regenerate verdict outputs from stored articles and events."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -8,7 +9,7 @@ from typing import Dict
 import pandas as pd
 
 from .scorer import aggregate_article_scores, aggregate_company_scores
-from .utils import OUT_DIR, load_json, setup_json_logger, log_json
+from .utils import OUT_DIR, load_json, log_json, setup_json_logger
 
 
 def _load_articles() -> pd.DataFrame:
@@ -50,9 +51,11 @@ def generate_verdicts(lookback: int = 14) -> Dict[str, Path]:
     article_scores_path = OUT_DIR / "article_verdicts.csv"
     article_scores.to_csv(article_scores_path, index=False)
 
-    company_scores = aggregate_company_scores(article_scores, lookback_days=lookback)
+    company_scores = aggregate_company_scores(article_scores, events, lookback_days=lookback)
     company_scores_path = OUT_DIR / "company_verdicts.csv"
+    signals_path = OUT_DIR / "signals.csv"
     company_scores.to_csv(company_scores_path, index=False)
+    company_scores.to_csv(signals_path, index=False)
 
     log_json(
         logger,
@@ -61,7 +64,11 @@ def generate_verdicts(lookback: int = 14) -> Dict[str, Path]:
         companies=len(company_scores),
         timestamp=datetime.utcnow().isoformat(),
     )
-    return {"article_verdicts": article_scores_path, "company_verdicts": company_scores_path}
+    return {
+        "article_verdicts": article_scores_path,
+        "company_verdicts": company_scores_path,
+        "signals": signals_path,
+    }
 
 
 __all__ = ["generate_verdicts"]

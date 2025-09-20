@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Dict
 
 from aidc_signals.pipeline import run_pipeline
 from aidc_signals.verdicts import generate_verdicts
@@ -39,12 +39,16 @@ def cmd_eventstudy(args: argparse.Namespace) -> None:
     if events.empty:
         print("No events to analyze")
         return
-    summary = events.groupby("event_type")["raw_score"].agg(["count", "mean", "sum"]).sort_values("sum", ascending=False)
+    summary = (
+        events.groupby("event_type")["scarcity_component"]
+        .agg(["count", "mean", "sum"])
+        .sort_values("sum", ascending=False)
+    )
     print(summary)
 
     fig, ax = plt.subplots(figsize=(10, 5))
-    summary["sum"].plot(kind="bar", ax=ax, title="Signal contribution by event type")
-    ax.set_ylabel("Cumulative score")
+    summary["sum"].plot(kind="bar", ax=ax, title="Scarcity contribution by event type")
+    ax.set_ylabel("Cumulative scarcity contribution")
     fig.tight_layout()
     output_path = OUT_DIR / "eventstudy_signal_contribution.png"
     fig.savefig(output_path)

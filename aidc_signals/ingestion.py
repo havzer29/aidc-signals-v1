@@ -41,6 +41,7 @@ class Article:
     company: str
     tier: str
     story_id: str
+    language: str
     raw: Dict[str, Any]
 
     def to_dict(self) -> Dict[str, Any]:
@@ -63,17 +64,32 @@ def unwrap_google_url(url: str) -> str:
     return url
 
 
+def _normalize_domain(url: str) -> str:
+    domain = urlparse(url).netloc.lower()
+    if domain.startswith("www."):
+        domain = domain[4:]
+    return domain
+
+
 def _infer_tier(domain: str) -> str:
     tiers_path = CONFIG_DIR / "domain_tiers.json"
     if tiers_path.exists():
         tiers = json.loads(tiers_path.read_text(encoding="utf-8"))
+        domain_lower = domain.lower()
         for tier, domains in tiers.items():
-            if domain in domains:
+            if any(domain_lower == d.lower() for d in domains):
                 return tier
+    if domain.endswith(".gov") or domain.endswith(".edu"):
+        return "tier1"
     return "tier3"
 
 
-def parse_entry(entry: Dict[str, Any], ticker_map: Dict[str, Dict[str, Any]]) -> Optional[Article]:
+def parse_entry(
+    entry: Dict[str, Any],
+    ticker_map: Dict[str, Dict[str, Any]],
+    *,
+    language: str = "unknown",
+) -> Optional[Article]:
     title = entry.get("title", "").strip()
     summary = entry.get("summary", "").strip()
     link = unwrap_google_url(entry.get("link", ""))
@@ -103,7 +119,7 @@ def parse_entry(entry: Dict[str, Any], ticker_map: Dict[str, Dict[str, Any]]) ->
     if not matched_ticker:
         return None
 
-    domain = urlparse(link).netloc
+    domain = _normalize_domain(link)
     tier = _infer_tier(domain)
     story_id = _hash_story(link, title)
     article_id = _hash_story(link, published_dt.isoformat())
@@ -119,8 +135,17 @@ def parse_entry(entry: Dict[str, Any], ticker_map: Dict[str, Dict[str, Any]]) ->
         company=matched_company,
         tier=tier,
         story_id=story_id,
+        language=language,
         raw={"aliases": matched_aliases, "entry": entry},
     )
+
+
+def _lang_params(lang: str) -> Dict[str, str]:
+    if lang.lower().startswith("fr"):
+        return {"hl": "fr", "gl": "FR", "ceid": "FR:fr"}
+    if lang.lower().startswith("en"):
+        return {"hl": "en-US", "gl": "US", "ceid": "US:en"}
+    return {"hl": lang, "gl": "US", "ceid": "US:en"}
 
 
 def _ingest_google_news(days: int, queries: List[str]) -> List[Article]:
@@ -134,29 +159,42 @@ def _ingest_google_news(days: int, queries: List[str]) -> List[Article]:
         for row in companies.to_dict(orient="records")
     }
 
+    language_codes = os.environ.get("AIDC_GOOGLE_LANGS", "en-US,fr-FR").split(",")
+    languages = [code.strip() for code in language_codes if code.strip()]
+    cutoff = datetime.now(tz=timezone.utc) - timedelta(days=days)
+
     for query in queries:
-        params = {"q": f"{query} when:{days}d", "hl": "en-US", "gl": "US", "ceid": "US:en"}
-        url = GOOGLE_NEWS_URL + "?" + httpx.QueryParams(params).render()
-        rate_limiter.wait()
-        try:
-            response = client.get(url)
-            response.raise_for_status()
-        except httpx.HTTPError as exc:
-            log_json(logger, event="google_news_error", query=query, error=str(exc))
-            continue
-        feed = feedparser.parse(response.text)
-        for entry in feed.entries:
-            article = parse_entry(entry, ticker_map)
-            if article:
-                articles.append(article)
+        for language in languages:
+            params = {"q": f"{query} when:{days}d"}
+            params.update(_lang_params(language))
+            url = GOOGLE_NEWS_URL + "?" + httpx.QueryParams(params).render()
+            rate_limiter.wait()
+            try:
+                response = client.get(url)
+                response.raise_for_status()
+            except httpx.HTTPError as exc:
                 log_json(
                     logger,
-                    event="article_hit",
-                    ticker=article.ticker,
-                    story_id=article.story_id,
-                    source=article.source,
-                    title=article.title,
+                    event="google_news_error",
+                    query=query,
+                    language=language,
+                    error=str(exc),
                 )
+                continue
+            feed = feedparser.parse(response.text)
+            for entry in feed.entries:
+                article = parse_entry(entry, ticker_map, language=language)
+                if article and article.published_at >= cutoff:
+                    articles.append(article)
+                    log_json(
+                        logger,
+                        event="article_hit",
+                        ticker=article.ticker,
+                        story_id=article.story_id,
+                        source=article.source,
+                        language=language,
+                        title=article.title,
+                    )
     client.close()
     return articles
 
@@ -197,12 +235,17 @@ def _ingest_rss(days: int) -> List[Article]:
 
 
 def deduplicate(articles: Iterable[Article]) -> List[Article]:
-    seen: Dict[str, Article] = {}
-    for article in articles:
-        key = article.story_id
-        if key not in seen or seen[key].published_at < article.published_at:
-            seen[key] = article
-    return list(seen.values())
+    by_story: Dict[str, Article] = {}
+    by_url: Dict[str, Article] = {}
+    for article in sorted(articles, key=lambda a: a.published_at, reverse=True):
+        if article.story_id not in by_story:
+            by_story[article.story_id] = article
+        if article.url not in by_url:
+            by_url[article.url] = article
+    merged: Dict[str, Article] = {}
+    for item in [*by_story.values(), *by_url.values()]:
+        merged[item.id] = item
+    return sorted(merged.values(), key=lambda a: a.published_at, reverse=True)
 
 
 def ingest(days: int = 2, use_google: bool = True, use_rss: bool = True) -> List[Dict[str, Any]]:

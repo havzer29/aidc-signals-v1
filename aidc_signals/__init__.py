@@ -1,9 +1,9 @@
 """AIDC Signals package."""
-from . import ingestion, content_fetcher, extractor, scorer, pipeline, verdicts
+from . import ingestion, extractor, pipeline, scorer, text_fetcher, verdicts
 
 __all__ = [
     "ingestion",
-    "content_fetcher",
+    "text_fetcher",
     "extractor",
     "scorer",
     "pipeline",

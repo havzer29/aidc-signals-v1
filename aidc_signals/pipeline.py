@@ -6,11 +6,11 @@ from typing import Dict, List
 
 import pandas as pd
 
-from .content_fetcher import fetch_contents
+from .text_fetcher import fetch_contents
 from .extractor import extract_batch
 from .ingestion import ingest
-from .scorer import aggregate_article_scores, score_events
-from .utils import OUT_DIR, log_json, setup_json_logger
+from .scorer import aggregate_article_scores, aggregate_company_scores, score_events
+from .utils import OUT_DIR, env_int, log_json, setup_json_logger
 
 
 def run_pipeline(days: int = 2, use_google: bool = True, use_rss: bool = True) -> Dict[str, Path]:
@@ -43,8 +43,12 @@ def run_pipeline(days: int = 2, use_google: bool = True, use_rss: bool = True) -
     article_scores_path = OUT_DIR / "article_verdicts.csv"
     article_scores.to_csv(article_scores_path, index=False)
 
+    default_lookback = env_int("AIDC_DEFAULT_LOOKBACK", 14)
+    company_scores = aggregate_company_scores(article_scores, events_df, lookback_days=default_lookback)
     signals_path = OUT_DIR / "signals.csv"
-    article_scores.to_csv(signals_path, index=False)
+    company_scores.to_csv(signals_path, index=False)
+    company_verdicts_path = OUT_DIR / "company_verdicts.csv"
+    company_scores.to_csv(company_verdicts_path, index=False)
 
     log_json(
         logger,
@@ -54,8 +58,9 @@ def run_pipeline(days: int = 2, use_google: bool = True, use_rss: bool = True) -
     )
     return {
         "events": events_path,
-        "signals": signals_path,
         "article_verdicts": article_scores_path,
+        "signals": signals_path,
+        "company_verdicts": company_verdicts_path,
     }
 
 

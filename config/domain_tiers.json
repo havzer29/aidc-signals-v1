@@ -1,28 +1,37 @@
 {
+  "IR": [
+    "investor.nvidia.com",
+    "investor.microsoft.com",
+    "ir.amd.com",
+    "investor.meta.com",
+    "ir.tsmc.com",
+    "abc.xyz",
+    "ir.amazon.com"
+  ],
   "tier1": [
-    "www.wsj.com",
-    "www.nytimes.com",
-    "www.reuters.com",
-    "www.bloomberg.com",
-    "www.ft.com",
-    "www.cnbc.com",
-    "www.barrons.com",
-    "www.seekingalpha.com"
+    "wsj.com",
+    "nytimes.com",
+    "reuters.com",
+    "bloomberg.com",
+    "ft.com",
+    "cnbc.com",
+    "barrons.com",
+    "seekingalpha.com"
   ],
   "tier2": [
-    "www.theverge.com",
-    "www.techcrunch.com",
-    "www.zdnet.com",
-    "www.datacenterdynamics.com",
-    "www.datacenterknowledge.com",
-    "www.fool.com",
-    "www.marketwatch.com",
-    "www.tomshardware.com"
+    "theverge.com",
+    "techcrunch.com",
+    "zdnet.com",
+    "datacenterdynamics.com",
+    "datacenterknowledge.com",
+    "fool.com",
+    "marketwatch.com",
+    "tomshardware.com"
   ],
   "tier3": [
-    "www.prnewswire.com",
-    "www.businesswire.com",
-    "www.globenewswire.com",
-    "www.marketscreener.com"
+    "prnewswire.com",
+    "businesswire.com",
+    "globenewswire.com",
+    "marketscreener.com"
   ]
 }
