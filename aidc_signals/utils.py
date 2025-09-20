@@ -8,6 +8,7 @@ import random
 import sys
 import time
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
@@ -151,6 +152,30 @@ def read_domain_tiers() -> Dict[str, Dict[str, Any]]:
         return json.load(fp)
 
 
+@lru_cache(maxsize=1)
+def _domain_weight_lookup() -> Dict[str, float]:
+    tiers = read_domain_tiers()
+    tier_weights = {
+        "tier1": float(os.environ.get("AIDC_TIER1_WEIGHT", 1.2)),
+        "tier2": float(os.environ.get("AIDC_TIER2_WEIGHT", 1.0)),
+        "tier3": float(os.environ.get("AIDC_TIER3_WEIGHT", 0.8)),
+    }
+    lookup: Dict[str, float] = {}
+    for tier, domains in tiers.items():
+        weight = tier_weights.get(tier, tier_weights["tier3"])
+        for domain in domains:
+            lookup[domain.lower()] = weight
+    return lookup
+
+
+def domain_quality(domain: str) -> float:
+    """Return the quality multiplier for a news domain."""
+
+    lookup = _domain_weight_lookup()
+    default_weight = float(os.environ.get("AIDC_DOMAIN_DEFAULT_WEIGHT", 0.9))
+    return lookup.get(domain.lower(), default_weight)
+
+
 def alias_matches(text: str, aliases: Iterable[str]) -> bool:
     lowered = text.lower()
     return any(alias.lower() in lowered for alias in aliases if alias)
@@ -174,5 +199,6 @@ __all__ = [
     "env_float",
     "chunked",
     "read_domain_tiers",
+    "domain_quality",
     "alias_matches",
 ]
